@@ -1,27 +1,20 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
+
+from apps.users.managers import UserManager
 
 
 class User(AbstractUser):
-    ROLE_CHOICES = [
-        ("admin", "Administrator"),
-        ("student", "Student"),
-    ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="student")
+    email = models.EmailField(unique=True, verbose_name="Email")
+    birth_date = models.DateField(verbose_name="Birth Date", null=True, blank=True)
+    is_active = models.BooleanField(default=False, verbose_name="Is Active")
+    is_staff = models.BooleanField(default=False, verbose_name="Is Staff")
 
-    groups = models.ManyToManyField(
-        "auth.Group",
-        verbose_name=_("groups"),
-        blank=True,
-        related_name="custom_user_set",
-    )
-    user_permissions = models.ManyToManyField(
-        "auth.Permission",
-        verbose_name=_("user permissions"),
-        blank=True,
-        related_name="custom_user_permissions_set",
-    )
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
-    def __str__(self):
-        return self.username
+    objects = UserManager()
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
